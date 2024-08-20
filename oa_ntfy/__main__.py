@@ -1,13 +1,13 @@
 from dependency_injector.wiring import inject, Provide
 
-from .services import Service
+from .services import OANtfyService
 from .containers import Container
 import argparse
 
 # from .schemas import Settings
 
 
-def main(mode: str, service: Service = Provide[Container.service]):
+def main(mode: str, service: OANtfyService = Provide[Container.service]):
     if mode == "list_labels":
         service.list_gmail_labels()
     elif mode == "daemon":

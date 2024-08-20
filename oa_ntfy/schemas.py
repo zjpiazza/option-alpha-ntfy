@@ -60,5 +60,6 @@ class NtfyNotificationFormat(Enum):
 
 @dataclass
 class NtfyNotification:
-    notification_text: str
-    notification_format: NtfyNotificationFormat
+    text: str
+    title: str
+    format: NtfyNotificationFormat

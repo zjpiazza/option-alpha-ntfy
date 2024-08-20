@@ -20,15 +20,15 @@ This application uses the package [simplegmail](https://github.com/jeremyephron/
 
 # Configuration Variables
 
-| Name                    | Description                                                 | Default                                                                 |
-|-------------------------|-------------------------------------------------------------|-------------------------------------------------------------------------|
-| `gmail_label_id`         | The label ID for filtering Gmail messages                   | None                                                                   |
-| `ntfy_topic_name`        | Topic name for the ntfy notifications                       | None                                                                   |
-| `ntfy_protected_topic`   | Whether the ntfy topic is protected                         | `false`                                                                 |
-| `ntfy_bearer_token`      | Bearer token for authenticating with ntfy                   | `null`                                                                  |
-| `position_open_regex`    | Regular expression for parsing position open notifications  | `'Bot:\s*(.*?)Symbol:\s*(.*?)Strategy:\s*(.*?)Position:\s*(.*?)Expiration:\s*(.*?)Quantity:\s*(.*?)Cost:\s*(.*?)Price:\s*(.*)'` |
-| `position_closed_regex`  | Regular expression for parsing position closed notifications| `'Bot:\s*(.*?)Symbol:\s*(.*?)Strategy:\s*(.*?)Position:\s*(.*?)Expiration:\s*(.*?)Quantity:\s*(.*?)Close Price\*:\s*(.*?)Profit/Loss:\s*(.*)'` |
-| `sleep_time`             | Time interval between checks (in seconds)                   | `60`                                                                    |
+| Name                            | Description                                                  | Default                                                                                                                                         |
+| ------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gmail.label_id`                | The label ID for filtering Gmail messages                    | None                                                                                                                                            |
+| `ntfy.topic_name`               | Topic name for the ntfy notifications                        | None                                                                                                                                            |
+| `ntfy.protected_topic`          | Whether the ntfy topic is protected                          | `false`                                                                                                                                         |
+| `ntfy.bearer_token`             | Bearer token for authenticating with ntfy                    | `null`                                                                                                                                          |
+| `general.position_open_regex`   | Regular expression for parsing position open notifications   | `'Bot:\s*(.*?)Symbol:\s*(.*?)Strategy:\s*(.*?)Position:\s*(.*?)Expiration:\s*(.*?)Quantity:\s*(.*?)Cost:\s*(.*?)Price:\s*(.*)'`                  |
+| `general.position_closed_regex` | Regular expression for parsing position closed notifications | `'Bot:\s*(.*?)Symbol:\s*(.*?)Strategy:\s*(.*?)Position:\s*(.*?)Expiration:\s*(.*?)Quantity:\s*(.*?)Close Price\*:\s*(.*?)Profit/Loss:\s*(.*)'`   |
+| `general.sleep_time`            | Time interval between checks (in seconds)                    | `60`                                                                                                                                            |
 
 
 
@@ -47,13 +47,13 @@ This application uses the package [simplegmail](https://github.com/jeremyephron/
 
 4. Insert appropriate values where placeholders exist
     
-    a. Find the appropriate Gmail label (run `python -m oa_ntfy --mode list_labels`) and copy the value to the `gmail_label_id` property
+    a. Find the appropriate Gmail label (run `python -m oa_ntfy --mode list_labels`) and copy the value to the `gmail.label_id` property
 
-    b. Insert your desired ntfy topic name to the `ntfy_topic_name` property
+    b. Insert your desired ntfy topic name to the `ntfy.topic_name` property
     
-    c. If using a protected topic, set the `ntfy_protected_topic` property to `true`
+    c. If using a protected topic, set the `ntfy.protected_topic` property to `true`
 
-    d. If using a protected topic, set the `ntfy_bearer_token` property. Access tokens for ntfy can be found here: [Account Settings](https://ntfy.sh/account).
+    d. If using a protected topic, set the `ntfy.bearer_token` property. Access tokens for ntfy can be found here: [Account Settings](https://ntfy.sh/account).
 
 
 5. Run application

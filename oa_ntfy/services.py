@@ -1,4 +1,5 @@
 import time
+import logging
 from .schemas import OATrade, OATradeClosed, OATradeOpened, NtfyNotification
 from requests import post, HTTPError
 from tinydb import TinyDB, Query
@@ -14,7 +15,7 @@ from jinja2 import Environment
 from datetime import datetime
 
 
-class Service:
+class OANtfyService:
 
     def __init__(
         self,
@@ -44,14 +45,17 @@ class Service:
         self.position_closed_regex = position_closed_regex
         self.dry_run = dry_run
 
-    def run(self):
-        while True:
-            print("Scanning for new messages...")
+        self.logger = logging.getLogger(self.__class__.__name__)
 
+    def run(self):
+        self.logger.info("Scanning for new messages...")
+
+        while True:
             messages = self.gmail.get_messages(labels=[self.gmail_label_id])
             for message in messages:
                 self.process_email(message)
 
+            self.logger.debug("Sleeping for %s seconds", self.sleep_time)
             time.sleep(self.sleep_time)
 
     def list_gmail_labels(self) -> None:
@@ -71,33 +75,37 @@ class Service:
         # TODO: Add retry handler
         notification = self.format_notification(trade)
 
-        headers = {"Title": str(trade), "Markdown": "yes"}
+        headers = {"Title": notification.title, "Markdown": "yes"}
 
         if self.ntfy_protected_topic:
             headers["Authorization"] = f"Bearer {self.ntfy_bearer_token}"
-        if notification.notification_format == "markdown":
+        if notification.format == "markdown":
             headers["Markdown"] = "yes"
 
         if self.dry_run:
-            print("-" * 80)
-            print(notification.notification_text)
-            print("-" * 80)
+            print(
+                f"\n"
+                f"{'-' * 80}\n"
+                f"{notification.title}\n"
+                f"\n"
+                f"{notification.text}\n"
+                f"{'-' * 80}"
+            )
             return True
 
         try:
             response = post(
                 f"https://ntfy.sh/{self.ntfy_topic_name}",
-                data=notification.notification_text,
+                data=notification.text,
                 headers=headers,
             )
             response.raise_for_status()
             if response.ok:
+                self.logger.info(trade)
                 return True
 
         except HTTPError:
             return False
-
-        print("")
 
     def format_notification(self, trade: OATrade) -> NtfyNotification:
 
@@ -111,7 +119,8 @@ class Service:
                 raise ValueError("Unsupported notification format")
 
             return NtfyNotification(
-                notification_text=template.render(
+                title=str(trade),
+                text=template.render(
                     bot=trade.bot,
                     symbol=trade.symbol,
                     strategy=trade.strategy,
@@ -121,7 +130,7 @@ class Service:
                     cost=trade.cost,
                     price=trade.price,
                 ),
-                notification_format=self.notification_format,
+                format=self.notification_format,
             )
         elif isinstance(trade, OATradeClosed):
 
@@ -133,7 +142,8 @@ class Service:
                 raise ValueError("Unsupported notification format")
 
             return NtfyNotification(
-                notification_text=template.render(
+                title=str(trade),
+                text=template.render(
                     bot=trade.bot,
                     symbol=trade.symbol,
                     strategy=trade.strategy,
@@ -143,7 +153,7 @@ class Service:
                     close_price=trade.close_price,
                     profit_loss=trade.profit_loss,
                 ),
-                notification_format=self.notification_format,
+                format=self.notification_format,
             )
         else:
             raise ValueError("Unsupported trade type")
@@ -157,6 +167,7 @@ class Service:
 
         # Hit old message, continue
         if search_result:
+            self.logger.debug(f"Message {message.id} already processed")
             return
 
         # Hit new message without a notification
@@ -168,6 +179,7 @@ class Service:
         # If notification is sent successfully, add the ID to the database
         if sent:
             self.db.insert({"id": message.id})
+            self.logger.debug(f"Notification sent for message {message.id}")
 
     def extract_order_detail(self, html_content: str):
 

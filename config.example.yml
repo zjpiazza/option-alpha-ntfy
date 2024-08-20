@@ -1,7 +1,15 @@
-gmail_label_id: 
-ntfy_topic_name: 
-ntfy_protected_topic: false
-ntfy_bearer_token: null
-position_open_regex: 'Bot:\s*(.*?)Symbol:\s*(.*?)Strategy:\s*(.*?)Position:\s*(.*?)Expiration:\s*(.*?)Quantity:\s*(.*?)Cost:\s*(.*?)Price:\s*(.*)'
-position_closed_regex: 'Bot:\s*(.*?)Symbol:\s*(.*?)Strategy:\s*(.*?)Position:\s*(.*?)Expiration:\s*(.*?)Quantity:\s*(.*?)Close Price\*:\s*(.*?)Profit/Loss:\s*(.*)'
-sleep_time: 60
+log:
+  level: "INFO"
+  format: "[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s"
+ntfy:
+  topic_name: 
+  protected_topic: false
+  bearer_token: null
+  format: plaintext
+gmail:
+  label_id: 
+general:
+  sleep_time: 60
+  position_open_regex: 'Bot:\s*(.*?)Symbol:\s*(.*?)Strategy:\s*(.*?)Position:\s*(.*?)Expiration:\s*(.*?)Quantity:\s*(.*?)Cost:\s*(.*?)Price:\s*(.*)'
+  position_closed_regex: 'Bot:\s*(.*?)Symbol:\s*(.*?)Strategy:\s*(.*?)Position:\s*(.*?)Expiration:\s*(.*?)Quantity:\s*(.*?)Close Price\*:\s*(.*?)Profit/Loss:\s*(.*)'
+  dry_run: true
