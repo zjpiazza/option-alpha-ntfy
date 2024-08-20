@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from typing import Any, Callable, Set, Optional
 from pydantic import (
     Field,
@@ -50,3 +51,14 @@ class OATradeClosed(OATrade):
 
     def __str__(self):
         return f"Position closed by {self.bot}: {self.quantity} {self.symbol} {self.strategy}"
+
+
+class NtfyNotificationFormat(Enum):
+    plaintext = "plaintext"
+    markdown = "markdown"
+
+
+@dataclass
+class NtfyNotification:
+    notification_text: str
+    notification_format: NtfyNotificationFormat

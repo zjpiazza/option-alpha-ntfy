@@ -1,4 +1,3 @@
-### Trade Closed
 - **Bot**: {{bot}}
 - **Symbol**: {{symbol}}
 - **Strategy**: {{strategy}}

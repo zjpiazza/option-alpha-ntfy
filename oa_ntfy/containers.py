@@ -26,6 +26,7 @@ class Container(containers.DeclarativeContainer):
         db=db,
         gmail=gmail,
         jinja_env=jinja_env,
+        notification_format=config.notification_format,
         gmail_label_id=config.gmail_label_id,
         sleep_time=config.sleep_time,
         ntfy_topic_name=config.ntfy_topic_name,
@@ -33,4 +34,5 @@ class Container(containers.DeclarativeContainer):
         ntfy_bearer_token=config.ntfy_bearer_token,
         position_open_regex=config.position_open_regex,
         position_closed_regex=config.position_closed_regex,
+        dry_run=config.dry_run,
     )

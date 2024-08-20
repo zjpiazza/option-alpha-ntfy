@@ -1,5 +1,5 @@
 import time
-from .schemas import OATrade, OATradeClosed, OATradeOpened
+from .schemas import OATrade, OATradeClosed, OATradeOpened, NtfyNotification
 from requests import post, HTTPError
 from tinydb import TinyDB, Query
 from simplegmail.message import Message as GmailMessage
@@ -20,6 +20,7 @@ class Service:
         self,
         db: TinyDB,
         gmail: Gmail,
+        notification_format: str,
         jinja_env: Environment,
         gmail_label_id: str,
         sleep_time: float,
@@ -28,9 +29,11 @@ class Service:
         ntfy_bearer_token: str,
         position_open_regex: str,
         position_closed_regex: str,
+        dry_run: bool,
     ) -> None:
         self.db = db
         self.gmail = gmail
+        self.notification_format = notification_format
         self.jinja_env = jinja_env
         self.gmail_label_id = gmail_label_id
         self.sleep_time = sleep_time
@@ -39,6 +42,7 @@ class Service:
         self.ntfy_bearer_token = ntfy_bearer_token
         self.position_open_regex = position_open_regex
         self.position_closed_regex = position_closed_regex
+        self.dry_run = dry_run
 
     def run(self):
         while True:
@@ -65,16 +69,25 @@ class Service:
     def send_ntfy_notification(self, trade: OATrade):
         # Send request
         # TODO: Add retry handler
+        notification = self.format_notification(trade)
+
         headers = {"Title": str(trade), "Markdown": "yes"}
 
         if self.ntfy_protected_topic:
             headers["Authorization"] = f"Bearer {self.ntfy_bearer_token}"
+        if notification.notification_format == "markdown":
+            headers["Markdown"] = "yes"
+
+        if self.dry_run:
+            print("-" * 80)
+            print(notification.notification_text)
+            print("-" * 80)
+            return True
 
         try:
-
             response = post(
                 f"https://ntfy.sh/{self.ntfy_topic_name}",
-                data=self.generate_markdown(trade),
+                data=notification.notification_text,
                 headers=headers,
             )
             response.raise_for_status()
@@ -84,31 +97,53 @@ class Service:
         except HTTPError:
             return False
 
-    def generate_markdown(self, trade: OATrade):
+        print("")
+
+    def format_notification(self, trade: OATrade) -> NtfyNotification:
 
         if isinstance(trade, OATradeOpened):
-            template = self.jinja_env.get_template("trade_opened.md")
-            return template.render(
-                bot=trade.bot,
-                symbol=trade.symbol,
-                strategy=trade.strategy,
-                position=trade.position,
-                expiration=trade.expiration,
-                quantity=trade.quantity,
-                cost=trade.cost,
-                price=trade.price,
+
+            if self.notification_format == "plaintext":
+                template = self.jinja_env.get_template("trade_opened.j2")
+            elif self.notification_format == "markdown":
+                template = self.jinja_env.get_template("trade_opened.md")
+            else:
+                raise ValueError("Unsupported notification format")
+
+            return NtfyNotification(
+                notification_text=template.render(
+                    bot=trade.bot,
+                    symbol=trade.symbol,
+                    strategy=trade.strategy,
+                    position=trade.position,
+                    expiration=trade.expiration,
+                    quantity=trade.quantity,
+                    cost=trade.cost,
+                    price=trade.price,
+                ),
+                notification_format=self.notification_format,
             )
         elif isinstance(trade, OATradeClosed):
-            template = self.jinja_env.get_template("trade_closed.md")
-            return template.render(
-                bot=trade.bot,
-                symbol=trade.symbol,
-                strategy=trade.strategy,
-                position=trade.position,
-                expiration=trade.expiration,
-                quantity=trade.quantity,
-                close_price=trade.close_price,
-                profit_loss=trade.profit_loss,
+
+            if self.notification_format == "plaintext":
+                template = self.jinja_env.get_template("trade_closed.j2")
+            elif self.notification_format == "markdown":
+                template = self.jinja_env.get_template("trade_closed.md")
+            else:
+                raise ValueError("Unsupported notification format")
+
+            return NtfyNotification(
+                notification_text=template.render(
+                    bot=trade.bot,
+                    symbol=trade.symbol,
+                    strategy=trade.strategy,
+                    position=trade.position,
+                    expiration=trade.expiration,
+                    quantity=trade.quantity,
+                    close_price=trade.close_price,
+                    profit_loss=trade.profit_loss,
+                ),
+                notification_format=self.notification_format,
             )
         else:
             raise ValueError("Unsupported trade type")

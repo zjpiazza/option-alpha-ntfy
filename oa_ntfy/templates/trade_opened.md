@@ -1,4 +1,3 @@
-### Trade Opened
 - **Bot**: {{bot}}
 - **Symbol**: {{symbol}}
 - **Strategy**: {{strategy}}
