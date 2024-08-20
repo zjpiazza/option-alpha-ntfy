@@ -12,6 +12,8 @@ from jinja2 import Environment
 
 
 from datetime import datetime
+
+
 class Service:
 
     def __init__(
@@ -38,16 +40,21 @@ class Service:
         self.position_open_regex = position_open_regex
         self.position_closed_regex = position_closed_regex
 
-
     def run(self):
         while True:
             print("Scanning for new messages...")
-                
+
             messages = self.gmail.get_messages(labels=[self.gmail_label_id])
             for message in messages:
                 self.process_email(message)
 
             time.sleep(self.sleep_time)
+
+    def list_gmail_labels(self) -> List[str]:
+        labels = [f"{label.name} ({label.id})" for label in self.gmail.list_labels()]
+
+        for label in labels:
+            print(label)
 
     def send_ntfy_notification(self, trade: OATrade):
         # Send request
@@ -75,20 +82,38 @@ class Service:
 
         if isinstance(trade, OATradeOpened):
             template = self.jinja_env.get_template("trade_opened.md")
-            return template.render(bot=trade.bot, symbol=trade.symbol, strategy=trade.strategy, position=trade.position, expiration=trade.expiration, quantity=trade.quantity, cost=trade.cost, price=trade.price)
+            return template.render(
+                bot=trade.bot,
+                symbol=trade.symbol,
+                strategy=trade.strategy,
+                position=trade.position,
+                expiration=trade.expiration,
+                quantity=trade.quantity,
+                cost=trade.cost,
+                price=trade.price,
+            )
         elif isinstance(trade, OATradeClosed):
             template = self.jinja_env.get_template("trade_closed.md")
-            return template.render(bot=trade.bot, symbol=trade.symbol, strategy=trade.strategy, position=trade.position, expiration=trade.expiration, quantity=trade.quantity, close_price=trade.close_price, profit_loss=trade.profit_loss)
+            return template.render(
+                bot=trade.bot,
+                symbol=trade.symbol,
+                strategy=trade.strategy,
+                position=trade.position,
+                expiration=trade.expiration,
+                quantity=trade.quantity,
+                close_price=trade.close_price,
+                profit_loss=trade.profit_loss,
+            )
         else:
             raise ValueError("Unsupported trade type")
-        
+
     def process_email(
         self,
         message: GmailMessage,
     ):
         EmailMessage = Query()
         search_result = self.db.search(EmailMessage.id == message.id)
-        
+
         # Hit old message, continue
         if search_result:
             return
@@ -108,10 +133,7 @@ class Service:
         if sent:
             self.db.insert({"id": message.id})
 
-    def extract_order_detail(
-        self,
-        html_content: str
-    ):
+    def extract_order_detail(self, html_content: str):
 
         # Create a BeautifulSoup object
         soup = BeautifulSoup(html_content, "html.parser")

@@ -8,23 +8,18 @@ from simplegmail import Gmail
 from .schemas import Settings
 from .services import Service
 
+
 class Container(containers.DeclarativeContainer):
 
     config = providers.Configuration()
 
-    jinja_env = providers.Resource(
-        Environment,
-        loader=PackageLoader("oa_ntfy")
-    )
+    jinja_env = providers.Resource(Environment, loader=PackageLoader("oa_ntfy"))
 
     db = providers.Resource(
-        lambda config_path: TinyDB(config_path),
-        config_path='db.json'
+        lambda config_path: TinyDB(config_path), config_path="db.json"
     )
 
-    gmail = providers.Resource(
-        Gmail
-    )
+    gmail = providers.Resource(Gmail)
 
     service = providers.Resource(
         Service,

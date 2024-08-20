@@ -17,6 +17,8 @@ jinja2 = "*"
 pydantic = "*"
 pyyaml = "*"
 dependency-injector = "==4.42.0b1"
+black = "*"
+pre-commit = "*"
 
 [dev-packages]
 

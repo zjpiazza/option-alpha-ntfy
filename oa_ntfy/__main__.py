@@ -2,19 +2,34 @@ from dependency_injector.wiring import inject, Provide
 
 from .services import Service
 from .containers import Container
+import argparse
+
 # from .schemas import Settings
 
-def main(service: Service = Provide[Container.service]):
-    service.run()
+
+def main(mode: str, service: Service = Provide[Container.service]):
+    if mode == "list_labels":
+        service.list_gmail_labels()
+    elif mode == "daemon":
+        service.run()
+    else:
+        exit(1)
+
 
 if __name__ == "__main__":
-    # from simplegmail import Gmail
+    parser = argparse.ArgumentParser(description="A Python application with modes.")
 
-    # gmail = Gmail()
+    # Adding the 'mode' argument with 'daemon' as the default
+    parser.add_argument(
+        "--mode",  # Changed from '-m' to '--mode'
+        type=str,
+        choices=["daemon", "list_labels"],
+        default="daemon",
+        help='Mode of operation: "daemon" (default) or "list_labels"',
+    )
 
-    # labels = gmail.list_labels()
-    # for label in labels:
-    #     print(f"{label.name} / {label.id}")
+    # Parse arguments
+    args = parser.parse_args()
 
     container = Container()
 
@@ -22,4 +37,4 @@ if __name__ == "__main__":
 
     container.init_resources()
     container.wire(modules=[__name__])
-    main()
+    main(mode=args.mode)
