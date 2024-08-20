@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+google-api-python-client = "*"
+google-auth-httplib2 = "*"
+google-auth-oauthlib = "*"
+simplegmail = "*"
+beautifulsoup4 = "*"
+tinydb = "*"
+requests = "*"
+python-dotenv = "*"
+pydantic-settings = "*"
+jinja2 = "*"
+pydantic = "*"
+pyyaml = "*"
+dependency-injector = "==4.42.0b1"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"

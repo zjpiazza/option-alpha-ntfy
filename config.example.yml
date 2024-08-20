@@ -1,0 +1,7 @@
+gmail_label_id: 
+ntfy_topic_name: 
+ntfy_protected_topic: false
+ntfy_bearer_token: null
+position_open_regex: 'Bot:\s*(.*?)Symbol:\s*(.*?)Strategy:\s*(.*?)Position:\s*(.*?)Expiration:\s*(.*?)Quantity:\s*(.*?)Cost:\s*(.*?)Price:\s*(.*)'
+position_closed_regex: 'Bot:\s*(.*?)Symbol:\s*(.*?)Strategy:\s*(.*?)Position:\s*(.*?)Expiration:\s*(.*?)Quantity:\s*(.*?)Close Price\*:\s*(.*?)Profit/Loss:\s*(.*)'
+sleep_time: 60
