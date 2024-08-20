@@ -50,18 +50,24 @@ class Service:
 
             time.sleep(self.sleep_time)
 
-    def list_gmail_labels(self) -> List[str]:
-        labels = [f"{label.name} ({label.id})" for label in self.gmail.list_labels()]
+    def list_gmail_labels(self) -> None:
+        name_width = 40
+        id_width = 20
 
-        for label in labels:
-            print(label)
+        # Print the header with the column widths
+        print(f"{'Label Name':<{name_width}} {'Label ID':<{id_width}}")
+        print("=" * (name_width + id_width))
+
+        # Print each label in a formatted manner
+        for label in self.gmail.list_labels():
+            print(f"{label.name:<{name_width}} {label.id:<{id_width}}")
 
     def send_ntfy_notification(self, trade: OATrade):
         # Send request
         # TODO: Add retry handler
         headers = {"Title": str(trade), "Markdown": "yes"}
 
-        if self.protected_topic:
+        if self.ntfy_protected_topic:
             headers["Authorization"] = f"Bearer {self.ntfy_bearer_token}"
 
         try:
@@ -122,12 +128,7 @@ class Service:
         trade = self.extract_order_detail(message.html)
 
         # Send notification
-        sent = self.send_ntfy_notification(
-            trade=trade,
-            topic=self.ntfy_topic_name,
-            protected_topic=self.ntfy_protected_topic,
-            token=self.ntfy_bearer_token,
-        )
+        sent = self.send_ntfy_notification(trade=trade)
 
         # If notification is sent successfully, add the ID to the database
         if sent:
