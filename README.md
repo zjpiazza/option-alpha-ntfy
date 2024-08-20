@@ -4,9 +4,11 @@
 
 I recently restarted my journey with trading options after several years, with the [Option Alpha](https://optionalpha.com/) platform. They do not have a mobile app that supports push notifications, so I created a very simple application which takes the email alerts generated via the Option Alpha platform and turns them into notifications via the service [ntfy](https://ntfy.sh/), which is a free pub-sub notification service.
 
-The only catch is that the free tier does not support "protected" topics, meaning anyone with the topic name can subscribe to your published data. While there isn't technically any sensitive data contained within these alerts, I felt more comfortable purchasing the lowest tier so that my trade data was on a private channel. The application supports both open and protected topics. They also support a self-hosted option, which I plan to support in the near future.
+The only catch is that the ntfy free tier does not support "protected" topics, meaning anyone with the topic name can subscribe to your published data. While there isn't technically any sensitive data contained within these alerts, I felt more comfortable purchasing the lowest tier so that my trade data was on a private channel. The application supports both open and protected topics. They also support a self-hosted option, which I plan to support in the near future.
 
-The alerts are just the markdown equivalent of the order details. The HTML is not exactly sematic so that was the most tedious part of writing this. The parsing logic is quite brittle but I imagine the structure will not change for some time. If any errors occur, please submit an issue.
+I use [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) for parsing the HTML contained within the email alerts. The alerts are just the markdown equivalent of the order details. The HTML is not exactly sematic so that was the most tedious part of writing this. The parsing logic is quite brittle but I imagine the structure will not change for some time. If any errors occur, please submit an issue.
+
+This application is still very raw and needs proper exception handling in many places.
 
 # Requirements
 - [Python 3.12](https://www.python.org/downloads/release/python-3125/)
